@@ -17,7 +17,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User create(User user) {
         if (emails.containsValue(user.getEmail())) {
-            throw new EmailDuplicateException("Пользователь с таким email уже был создан");
+            throw new EmailDuplicateException("Пользователь с таким email уже создан");
         }
         user.setId(++id);
         users.put(user.getId(), user);
