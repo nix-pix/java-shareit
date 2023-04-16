@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exceptions.IncorrectItemException;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -19,12 +18,6 @@ public class ItemController {
     @PostMapping
     public ItemDto create(@RequestHeader("X-Sharer-User-Id") long userId,
                           @Valid @RequestBody ItemDto itemDto) {
-        if (itemDto.getName() == null || itemDto.getName().isBlank() || itemDto.getDescription() == null || itemDto.getDescription().isBlank()) {
-            throw new IncorrectItemException("Имя или описание заполнены неправильно");
-        }
-        if (itemDto.getAvailable() == null) {
-            throw new IncorrectItemException("Не заполнено поле доступности вещи");
-        }
         return ItemMapper.toItemDto(itemService.create(userId, ItemMapper.toItem(itemDto)));
     }
 

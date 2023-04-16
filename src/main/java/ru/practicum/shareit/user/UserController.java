@@ -2,7 +2,6 @@ package ru.practicum.shareit.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exceptions.IncorrectUserException;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -16,9 +15,6 @@ public class UserController {
 
     @PostMapping
     public UserDto create(@Valid @RequestBody UserDto userDto) {
-        if (userDto.getEmail() == null || userDto.getName() == null) {
-            throw new IncorrectUserException("Некорректно заполнено имя или email");
-        }
         return UserMapper.toUserDto(userService.create(UserMapper.toUser(userDto)));
     }
 
