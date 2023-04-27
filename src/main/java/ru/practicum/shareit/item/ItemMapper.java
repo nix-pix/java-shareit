@@ -1,5 +1,8 @@
 package ru.practicum.shareit.item;
 
+import ru.practicum.shareit.booking.BookingAllDto;
+import ru.practicum.shareit.booking.BookingDto;
+
 import java.util.List;
 
 public class ItemMapper {
