@@ -37,8 +37,8 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingAllDto save(BookingControllerDto bookingControllerDto, ItemAllDto itemDto, Long id) {
         if (itemDto.getOwnerId().equals(id))
-            throw new ObjectNotFoundException("Вещь с id = " + itemDto.getId() + " не может быть арендована");
-        if (Boolean.FALSE.equals(itemDto.getAvailable()))
+            throw new ObjectNotFoundException("Вещь с id = " + itemDto.getId() + " не можеь быть арендована");
+        if (!itemDto.getAvailable())
             throw new IncorrectParameterException("Вещь с id = " + itemDto.getId() + " уже арендована");
         valid(bookingControllerDto);
         User booker = UserMapper.toUser(userService.get(id));
@@ -167,7 +167,7 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.mapToBookingAllFieldsDto(booking);
     }
 
-    private void valid(@org.jetbrains.annotations.NotNull BookingControllerDto bookingSavingDto) {
+    private void valid(BookingControllerDto bookingSavingDto) {
         if (bookingSavingDto.getStart() == null)
             throw new IncorrectParameterException("Не задана дата начала бронирования");
         if (bookingSavingDto.getEnd() == null)
