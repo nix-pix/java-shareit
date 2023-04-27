@@ -4,10 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.BookingAllDto;
 import ru.practicum.shareit.booking.BookingService;
+import ru.practicum.shareit.booking.dto.BookingAllDto;
 import ru.practicum.shareit.exceptions.IncorrectParameterException;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemAllDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
@@ -28,17 +31,17 @@ import static ru.practicum.shareit.enums.States.PAST;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
-    private final CommentStorage commentStorage;
+    private final CommentRepository commentRepository;
     private final BookingService bookingService;
 
     @Autowired
     public ItemServiceImpl(ItemRepository itemStorage,
                            UserService userService,
-                           CommentStorage commentStorage,
+                           CommentRepository commentStorage,
                            BookingService bookingService) {
         this.itemRepository = itemStorage;
         this.userService = userService;
-        this.commentStorage = commentStorage;
+        this.commentRepository = commentStorage;
         this.bookingService = bookingService;
     }
 
@@ -46,7 +49,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemAllDto get(Long id, Long userId) {
         Item item = itemRepository.findById(id).orElseThrow(
                 () -> new ObjectNotFoundException("Вещь с id " + id + " не найдена"));
-        List<Comment> comments = commentStorage.findByItem(item, Sort.by(DESC, "created"));
+        List<Comment> comments = commentRepository.findByItem(item, Sort.by(DESC, "created"));
         List<BookingAllDto> bookings = bookingService.getBookingsByItem(item.getId(), userId);
         return ItemMapper.toItemAllFieldsDto(item,
                 getLastItem(bookings),
@@ -100,10 +103,10 @@ public class ItemServiceImpl implements ItemService {
         User owner = UserMapper.toUser(userService.get(id));
         if (owner != null) {
             List<Item> allItems = itemRepository.findAllByOwner_IdIs(id);
-            List<Comment> comments = commentStorage.findByItemIn(allItems, Sort.by(DESC, "created"));
+            List<Comment> comments = commentRepository.findByItemIn(allItems, Sort.by(DESC, "created"));
             Map<Long, List<BookingAllDto>> bookings = bookingService.getBookingsByOwner(id, null).stream()
                     .collect(groupingBy((BookingAllDto bookingExtendedDto) -> bookingExtendedDto.getItem().getId()));
-            return  allItems.stream()
+            return allItems.stream()
                     .map(item -> getItemAllFieldsDto(comments, bookings, item))
                     .collect(toList());
         } else {
@@ -136,13 +139,13 @@ public class ItemServiceImpl implements ItemService {
         comment.setItem(item);
         comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
-        Comment save = commentStorage.save(comment);
+        Comment save = commentRepository.save(comment);
         return CommentMapper.toCommentDto(save);
     }
 
     @Override
     public List<CommentDto> getAllComments() {
-        return commentStorage.findAll()
+        return commentRepository.findAll()
                 .stream()
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
