@@ -6,8 +6,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.IncorrectParameterException;
+import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.exceptions.ParameterException;
-import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.Collection;
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto update(UserDto userDto, long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> {
-            throw new UserNotFoundException("Пользователь с id = " + userId + " не найден.");
+            throw new ObjectNotFoundException("Пользователь с id = " + userId + " не найден.");
         });
 
         if (userDto.getName() != null) {
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
     public UserDto get(long userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            throw new UserNotFoundException("Пользователь с id = " + userId + " не найден");
+            throw new ObjectNotFoundException("Пользователь с id = " + userId + " не найден");
         }
         return UserMapper.toUserDto(user.get());
     }
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
     public void valid(UserDto user) {
         if (user == null) {
             throw new IncorrectParameterException("При создании пользователя передан некорректный параметр");
-        }  else if (user.getEmail() == null) {
+        } else if (user.getEmail() == null) {
             throw new IncorrectParameterException("Email не может быть пустым");
         } else if (!isValidEmailAddress(user.getEmail())) {
             throw new IncorrectParameterException("Неверно задан email");

@@ -1,7 +1,9 @@
 package ru.practicum.shareit.booking;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.enums.Status;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
@@ -15,6 +17,8 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Entity
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "bookings")
 public class Booking {
     @Id

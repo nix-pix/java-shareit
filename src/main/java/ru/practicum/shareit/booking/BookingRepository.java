@@ -7,7 +7,8 @@ import ru.practicum.shareit.user.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface BookingStorage extends JpaRepository<Booking, Long> {
+public interface BookingRepository extends JpaRepository<Booking, Long> {
+
     List<Booking> findBookingsByItemOwnerIsAndStartBeforeAndEndAfterOrderByStartDesc(User user,
                                                                                      LocalDateTime startDateTime,
                                                                                      LocalDateTime endDateTime);

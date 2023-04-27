@@ -1,48 +1,63 @@
 package ru.practicum.shareit.exceptions;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@Slf4j
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @RestControllerAdvice
 public class ErrorHandler {
-
-    @ExceptionHandler
-    public ResponseEntity<?> handleDuplicatedEmail(final EmailDuplicateException e) {
-        log.warn(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
+        List<String> errors = ex.getBindingResult().getFieldErrors()
+                .stream().map(FieldError::getDefaultMessage).collect(Collectors.toList());
+        return new ResponseEntity<>(getErrorsMap(errors), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
-    public ResponseEntity<?> handleIncorrectItemCreate(final IncorrectItemException e) {
-        log.warn(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
+        return new ErrorResponse(
+                String.format(e.getMessage())
+        );
     }
 
     @ExceptionHandler
-    public ResponseEntity<?> handleIncorrectUserCreate(final IncorrectUserException e) {
-        log.warn(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleUserNotFoundException(final ObjectNotFoundException e) {
+        return new ErrorResponse(
+                e.getMessage()
+        );
     }
 
     @ExceptionHandler
-    public ResponseEntity<?> handleItemNotFoundException(final ItemNotFoundException e) {
-        log.warn(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleParameterException(final ParameterException e) {
+        return new ErrorResponse(
+                e.getMessage()
+        );
     }
 
     @ExceptionHandler
-    public ResponseEntity<?> handleUserNotFoundException(final UserNotFoundException e) {
-        log.warn(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleThrowable(final Throwable e) {
+        return new ErrorResponse(
+                "Произошла непредвиденная ошибка."
+        );
     }
 
-    @ExceptionHandler
-    public ResponseEntity<?> handleNotOwnerException(final NotOwnerException e) {
-        log.warn(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    private Map<String, List<String>> getErrorsMap(List<String> errors) {
+        Map<String, List<String>> errorResponse = new HashMap<>();
+        errorResponse.put("errors", errors);
+        return errorResponse;
     }
 }
