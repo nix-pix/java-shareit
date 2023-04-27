@@ -14,9 +14,9 @@ import java.util.List;
 public class ItemController {
     private final ItemService itemService;
 
-    @PostMapping
-    public ItemDto create(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
-                          @RequestBody ItemDto itemDto) {
+    @PostMapping()
+    public ItemDto save(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
+                        @RequestBody ItemDto itemDto) {
         return itemService.save(itemDto, userId);
     }
 
@@ -27,20 +27,14 @@ public class ItemController {
         return itemService.update(itemDto, itemId, userId);
     }
 
-//    @DeleteMapping("/{itemId}")
-//    public void delete(@RequestHeader("X-Sharer-User-Id") long userId,
-//                       @PathVariable long itemId) {
-//        itemService.delete(userId, itemId);
-//    }
-
     @GetMapping("/{itemId}")
     public ItemAllDto get(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
                           @PathVariable Long itemId) {
         return itemService.get(itemId, userId);
     }
 
-    @GetMapping
-    public List<ItemAllDto> getAllUsersItems(@RequestHeader(value = "X-Sharer-User-Id") Long userId) {
+    @GetMapping()
+    public List<ItemAllDto> getAllItems(@RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         return itemService.getAll(userId);
     }
 
@@ -56,4 +50,5 @@ public class ItemController {
                                     Long userId) {
         return itemService.createComment(commentDto, itemId, userId);
     }
+
 }

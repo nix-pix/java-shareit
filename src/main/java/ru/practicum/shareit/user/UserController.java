@@ -16,9 +16,9 @@ import java.util.Collection;
 public class UserController {
     UserService userService;
 
-    @PostMapping
+    @PostMapping()
     public UserDto create(@RequestBody @Validated(Create.class) UserDto user) {
-        return userService.create(user);
+        return userService.save(user);
     }
 
     @PatchMapping("/{userId}")
