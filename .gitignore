@@ -34,3 +34,6 @@ build/
 
 ### My JSON ###
 .json
+
+### Checkstyle ###
+checkstyle.xml
