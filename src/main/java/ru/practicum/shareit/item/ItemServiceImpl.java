@@ -41,9 +41,10 @@ public class ItemServiceImpl implements ItemService {
                 () -> new ObjectNotFoundException("Вещь с id " + id + " не найдена"));
         List<Comment> comments = commentRepository.findByItem(item, Sort.by(DESC, "created"));
         List<BookingAllDto> bookings = bookingService.getBookingsByItem(item.getId(), userId);
+        LocalDateTime now = LocalDateTime.now();
         return ItemMapper.toItemAllFieldsDto(item,
-                getLastItem(bookings),
-                getNextItem(bookings),
+                getLastItem(bookings, now),
+                getNextItem(bookings, now),
                 comments.stream().map(CommentMapper::toCommentDto).collect(toList()));
     }
 
@@ -136,24 +137,25 @@ public class ItemServiceImpl implements ItemService {
     private ItemAllDto getItemAllFieldsDto(List<Comment> comments,
                                            Map<Long, List<BookingAllDto>> bookings,
                                            Item item) {
+        LocalDateTime now = LocalDateTime.now();
         return ItemMapper.toItemAllFieldsDto(item,
-                getLastItem(bookings.get(item.getId())),
-                getNextItem(bookings.get(item.getId())),
+                getLastItem(bookings.get(item.getId()), now),
+                getNextItem(bookings.get(item.getId()), now),
                 comments.stream().map(CommentMapper::toCommentDto).collect(toList()));
     }
 
-    private BookingAllDto getNextItem(List<BookingAllDto> bookings) {
+    private BookingAllDto getNextItem(List<BookingAllDto> bookings, LocalDateTime now) {
         return bookings != null
                 ? bookings.stream()
-                .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()) && !Objects.equals(booking.getStatus().toString(), "REJECTED"))
+                .filter(booking -> booking.getStart().isAfter(now) && !Objects.equals(booking.getStatus().toString(), "REJECTED"))
                 .min(Comparator.comparing(BookingAllDto::getEnd)).orElse(null)
                 : null;
     }
 
-    private BookingAllDto getLastItem(List<BookingAllDto> bookings) {
+    private BookingAllDto getLastItem(List<BookingAllDto> bookings, LocalDateTime now) {
         return bookings != null
                 ? bookings.stream()
-                .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
+                .filter(booking -> !booking.getStart().isAfter(now))
                 .max(Comparator.comparing(BookingAllDto::getEnd)).orElse(null)
                 : null;
     }
