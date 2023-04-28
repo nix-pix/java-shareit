@@ -31,13 +31,13 @@ import static ru.practicum.shareit.enums.Status.*;
 @Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final UserService userService;
-    private final BookingRepository bookingStorage;
+    private final BookingRepository bookingRepository;
 
     @Override
     @Transactional
     public BookingAllDto save(BookingControllerDto bookingControllerDto, ItemAllDto itemDto, Long id) {
         if (itemDto.getOwnerId().equals(id))
-            throw new ObjectNotFoundException("Вещь с id = " + itemDto.getId() + " не можеь быть арендована");
+            throw new ObjectNotFoundException("Вещь с id = " + itemDto.getId() + " не может быть арендована");
         if (!itemDto.getAvailable())
             throw new IncorrectParameterException("Вещь с id = " + itemDto.getId() + " уже арендована");
         valid(bookingControllerDto);
@@ -47,14 +47,14 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(WAITING);
         booking.setBooker(booker);
         booking.setItem(item);
-        Booking savedBooking = bookingStorage.save(booking);
+        Booking savedBooking = bookingRepository.save(booking);
         return BookingMapper.mapToBookingAllFieldsDto(savedBooking);
     }
 
     @Override
     @Transactional
     public BookingAllDto approve(Long bookingId, boolean approved, Long userId) {
-        Booking booking = bookingStorage.findById(bookingId).orElseThrow(
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(
                 () -> new ObjectNotFoundException("Такого бронирования не существует"));
         if (booking.getBooker().getId().equals(userId))
             throw new ObjectNotFoundException("Пользователь с id = " + userId + " не может одобрить заявку");
@@ -62,7 +62,7 @@ public class BookingServiceImpl implements BookingService {
                 || !booking.getStatus().equals(WAITING))
             throw new IncorrectParameterException("Бронирование не может быть обновлено");
         booking.setStatus(approved ? APPROVED : REJECTED);
-        Booking savedBooking = bookingStorage.save(booking);
+        Booking savedBooking = bookingRepository.save(booking);
         return BookingMapper.mapToBookingAllFieldsDto(savedBooking);
     }
 
@@ -71,33 +71,33 @@ public class BookingServiceImpl implements BookingService {
         UserDto userDto = userService.get(userId);
         User user = UserMapper.toUser(userDto);
         if (state == null || States.ALL.name().equals(state)) {
-            return bookingStorage.findBookingsByItemOwnerIsOrderByStartDesc(user)
+            return bookingRepository.findBookingsByItemOwnerIsOrderByStartDesc(user)
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
         if (States.PAST.name().equals(state)) {
-            return bookingStorage.findBookingsByItemOwnerAndEndBeforeOrderByStartDesc(user, LocalDateTime.now())
+            return bookingRepository.findBookingsByItemOwnerAndEndBeforeOrderByStartDesc(user, LocalDateTime.now())
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
         if (States.CURRENT.name().equals(state)) {
-            return bookingStorage.findBookingsByItemOwnerIsAndStartBeforeAndEndAfterOrderByStartDesc(
+            return bookingRepository.findBookingsByItemOwnerIsAndStartBeforeAndEndAfterOrderByStartDesc(
                             user, LocalDateTime.now(), LocalDateTime.now())
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
         if (States.FUTURE.name().equals(state)) {
-            return bookingStorage.findBookingsByItemOwnerAndStartAfterOrderByStartDesc(
+            return bookingRepository.findBookingsByItemOwnerAndStartAfterOrderByStartDesc(
                             user, LocalDateTime.now())
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
         if (stream(values()).anyMatch(bookingState -> bookingState.name().equals(state))) {
-            return bookingStorage.findBookingsByItemOwnerIsAndStatusIsOrderByStartDesc(
+            return bookingRepository.findBookingsByItemOwnerIsAndStatusIsOrderByStartDesc(
                             user, valueOf(state))
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
@@ -108,7 +108,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingAllDto> getBookingsByItem(Long itemId, Long userId) {
-        return bookingStorage.findBookingsByItem_IdAndItem_Owner_IdIsOrderByStart(
+        return bookingRepository.findBookingsByItem_IdAndItem_Owner_IdIsOrderByStart(
                         itemId, userId)
                 .stream()
                 .map(BookingMapper::mapToBookingAllFieldsDto)
@@ -120,34 +120,34 @@ public class BookingServiceImpl implements BookingService {
         UserDto userDto = userService.get(bookerId);
         User booker = UserMapper.toUser(userDto);
         if (state == null || States.ALL.name().equals(state)) {
-            return bookingStorage.findBookingsByBookerIsOrderByStartDesc(booker)
+            return bookingRepository.findBookingsByBookerIsOrderByStartDesc(booker)
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
         if (States.PAST.name().equals(state)) {
-            return bookingStorage.findBookingsByBookerIsAndEndBeforeOrderByStartDesc(
+            return bookingRepository.findBookingsByBookerIsAndEndBeforeOrderByStartDesc(
                             booker, LocalDateTime.now())
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
         if (States.CURRENT.name().equals(state)) {
-            return bookingStorage.findBookingsByBookerIsAndStartBeforeAndEndAfterOrderByStartDesc(
+            return bookingRepository.findBookingsByBookerIsAndStartBeforeAndEndAfterOrderByStartDesc(
                             booker, LocalDateTime.now(), LocalDateTime.now())
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
         if (States.FUTURE.name().equals(state)) {
-            return bookingStorage.findBookingsByBookerIsAndStartIsAfterOrderByStartDesc(
+            return bookingRepository.findBookingsByBookerIsAndStartIsAfterOrderByStartDesc(
                             booker, LocalDateTime.now())
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
         if (stream(values()).anyMatch(bookingState -> bookingState.name().equals(state))) {
-            return bookingStorage.findBookingsByBookerIsAndStatusIsOrderByStartDesc(
+            return bookingRepository.findBookingsByBookerIsAndStatusIsOrderByStartDesc(
                             booker, valueOf(state))
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
@@ -158,7 +158,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingAllDto get(Long bookingId, Long userId) {
-        var booking = bookingStorage.findById(bookingId).orElseThrow(
+        var booking = bookingRepository.findById(bookingId).orElseThrow(
                 () -> new ObjectNotFoundException("Такого бронирования не существует"));
         if (!booking.getBooker().getId().equals(userId)
                 && !booking.getItem().getOwner().getId().equals(userId)) {
@@ -173,9 +173,9 @@ public class BookingServiceImpl implements BookingService {
         if (bookingSavingDto.getEnd() == null)
             throw new IncorrectParameterException("Не задана дата окончания бронирования");
         if (bookingSavingDto.getStart().equals(bookingSavingDto.getEnd()))
-            throw new IncorrectParameterException("Не задана дата начала бронирования");
+            throw new IncorrectParameterException("Даты начала и конца бронирования совпадают");
         if (bookingSavingDto.getStart().toLocalDate().isBefore(LocalDate.now()))
-            throw new IncorrectParameterException("Некорректная дата начала броинрования");
+            throw new IncorrectParameterException("Некорректная дата начала бронирования");
         if (bookingSavingDto.getEnd().isBefore(bookingSavingDto.getStart())
                 || bookingSavingDto.getEnd().toLocalDate().isBefore(LocalDate.now()))
             throw new IncorrectParameterException("Некорректная дата бронирования");

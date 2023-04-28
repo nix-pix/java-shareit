@@ -10,7 +10,6 @@ import ru.practicum.shareit.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
 
-
 @Data
 @Builder
 @NoArgsConstructor
