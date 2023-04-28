@@ -1,6 +1,6 @@
 package ru.practicum.shareit.enums;
 
-public enum States {
+public enum State {
     ALL,
     PAST,
     CURRENT,

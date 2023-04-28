@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingAllDto;
 import ru.practicum.shareit.booking.dto.BookingControllerDto;
-import ru.practicum.shareit.enums.States;
-import ru.practicum.shareit.exceptions.IncorrectParameterException;
-import ru.practicum.shareit.exceptions.ObjectNotFoundException;
+import ru.practicum.shareit.enums.State;
+import ru.practicum.shareit.exception.IncorrectParameterException;
+import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemAllDto;
@@ -70,26 +70,26 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingAllDto> getBookingsByOwner(Long userId, String state) {
         UserDto userDto = userService.get(userId);
         User user = UserMapper.toUser(userDto);
-        if (state == null || States.ALL.name().equals(state)) {
+        if (state == null || State.ALL.name().equals(state)) {
             return bookingRepository.findBookingsByItemOwnerIsOrderByStartDesc(user)
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
-        if (States.PAST.name().equals(state)) {
+        if (State.PAST.name().equals(state)) {
             return bookingRepository.findBookingsByItemOwnerAndEndBeforeOrderByStartDesc(user, LocalDateTime.now())
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
-        if (States.CURRENT.name().equals(state)) {
+        if (State.CURRENT.name().equals(state)) {
             return bookingRepository.findBookingsByItemOwnerIsAndStartBeforeAndEndAfterOrderByStartDesc(
                             user, LocalDateTime.now(), LocalDateTime.now())
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
-        if (States.FUTURE.name().equals(state)) {
+        if (State.FUTURE.name().equals(state)) {
             return bookingRepository.findBookingsByItemOwnerAndStartAfterOrderByStartDesc(
                             user, LocalDateTime.now())
                     .stream()
@@ -119,27 +119,27 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingAllDto> getAll(Long bookerId, String state) {
         UserDto userDto = userService.get(bookerId);
         User booker = UserMapper.toUser(userDto);
-        if (state == null || States.ALL.name().equals(state)) {
+        if (state == null || State.ALL.name().equals(state)) {
             return bookingRepository.findBookingsByBookerIsOrderByStartDesc(booker)
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
-        if (States.PAST.name().equals(state)) {
+        if (State.PAST.name().equals(state)) {
             return bookingRepository.findBookingsByBookerIsAndEndBeforeOrderByStartDesc(
                             booker, LocalDateTime.now())
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
-        if (States.CURRENT.name().equals(state)) {
+        if (State.CURRENT.name().equals(state)) {
             return bookingRepository.findBookingsByBookerIsAndStartBeforeAndEndAfterOrderByStartDesc(
                             booker, LocalDateTime.now(), LocalDateTime.now())
                     .stream()
                     .map(BookingMapper::mapToBookingAllFieldsDto)
                     .collect(toList());
         }
-        if (States.FUTURE.name().equals(state)) {
+        if (State.FUTURE.name().equals(state)) {
             return bookingRepository.findBookingsByBookerIsAndStartIsAfterOrderByStartDesc(
                             booker, LocalDateTime.now())
                     .stream()
