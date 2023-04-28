@@ -25,13 +25,14 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static ru.practicum.shareit.enums.States.PAST;
 
+
 @Slf4j
 @Service
 @Transactional
 public class ItemServiceImpl implements ItemService {
-    private final ItemRepository itemRepository;
+    private final ItemRepository itemStorage;
     private final UserService userService;
-    private final CommentRepository commentRepository;
+    private final CommentRepository commentStorage;
     private final BookingService bookingService;
 
     @Autowired
@@ -39,22 +40,22 @@ public class ItemServiceImpl implements ItemService {
                            UserService userService,
                            CommentRepository commentStorage,
                            BookingService bookingService) {
-        this.itemRepository = itemStorage;
+        this.itemStorage = itemStorage;
         this.userService = userService;
-        this.commentRepository = commentStorage;
+        this.commentStorage = commentStorage;
         this.bookingService = bookingService;
     }
 
     @Override
     public ItemAllDto get(Long id, Long userId) {
-        Item item = itemRepository.findById(id).orElseThrow(
+        Item item = itemStorage.findById(id).orElseThrow(
                 () -> new ObjectNotFoundException("Вещь с id " + id + " не найдена"));
-        List<Comment> comments = commentRepository.findByItem(item, Sort.by(DESC, "created"));
+        List<Comment> comments = commentStorage.findByItem(item, Sort.by(DESC, "created"));
         List<BookingAllDto> bookings = bookingService.getBookingsByItem(item.getId(), userId);
         return ItemMapper.toItemAllFieldsDto(item,
-                getLastItem(bookings),
-                getNextItem(bookings),
-                comments.stream().map(CommentMapper::toCommentDto).collect(toList()));
+               getLastItem(bookings),
+               getNextItem(bookings),
+               comments.stream().map(CommentMapper::toCommentDto).collect(toList()));
     }
 
     @Override
@@ -64,7 +65,7 @@ public class ItemServiceImpl implements ItemService {
         User owner = UserMapper.toUser(userService.get(userId));
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(owner);
-        return ItemMapper.toItemDto(itemRepository.save(item));
+        return ItemMapper.toItemDto(itemStorage.save(item));
     }
 
     @Override
@@ -74,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
             throw new IncorrectParameterException("Id пользователя не задан!");
         }
 
-        Item item = itemRepository.getReferenceById(id);
+        Item item = itemStorage.getReferenceById(id);
 
         if (!item.getOwner().getId().equals(userId)) {
             throw new ObjectNotFoundException("Пользователь с id=" + userId + " не является владельцем вещи с id=" + id);
@@ -102,11 +103,11 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemAllDto> getAll(Long id) {
         User owner = UserMapper.toUser(userService.get(id));
         if (owner != null) {
-            List<Item> allItems = itemRepository.findAllByOwner_IdIs(id);
-            List<Comment> comments = commentRepository.findByItemIn(allItems, Sort.by(DESC, "created"));
+            List<Item> allItems = itemStorage.findAllByOwner_IdIs(id);
+            List<Comment> comments = commentStorage.findByItemIn(allItems, Sort.by(DESC, "created"));
             Map<Long, List<BookingAllDto>> bookings = bookingService.getBookingsByOwner(id, null).stream()
                     .collect(groupingBy((BookingAllDto bookingExtendedDto) -> bookingExtendedDto.getItem().getId()));
-            return allItems.stream()
+            return  allItems.stream()
                     .map(item -> getItemAllFieldsDto(comments, bookings, item))
                     .collect(toList());
         } else {
@@ -118,7 +119,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getByText(String text) {
         if (text.isBlank()) return Collections.emptyList();
-        return itemRepository.getAllText(text).stream()
+        return itemStorage.getAllText(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(toList());
     }
@@ -130,7 +131,7 @@ public class ItemServiceImpl implements ItemService {
                                     Long userId) {
         if (commentDto.getText() == null || commentDto.getText().isBlank())
             throw new IncorrectParameterException("Текст комментария не может быть пустым");
-        Item item = itemRepository.findById(itemId).orElseThrow(
+        Item item = itemStorage.findById(itemId).orElseThrow(
                 () -> new ObjectNotFoundException("Вещь с id = " + itemId + " не найдена"));
         User user = UserMapper.toUser(userService.get(userId));
         List<BookingAllDto> bookings = bookingService.getAll(userId, PAST.name());
@@ -139,13 +140,13 @@ public class ItemServiceImpl implements ItemService {
         comment.setItem(item);
         comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
-        Comment save = commentRepository.save(comment);
+        Comment save = commentStorage.save(comment);
         return CommentMapper.toCommentDto(save);
     }
 
     @Override
     public List<CommentDto> getAllComments() {
-        return commentRepository.findAll()
+        return commentStorage.findAll()
                 .stream()
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
@@ -154,10 +155,10 @@ public class ItemServiceImpl implements ItemService {
     private ItemAllDto getItemAllFieldsDto(List<Comment> comments,
                                            Map<Long, List<BookingAllDto>> bookings,
                                            Item item) {
-        return ItemMapper.toItemAllFieldsDto(item,
-                getLastItem(bookings.get(item.getId())),
-                getNextItem(bookings.get(item.getId())),
-                comments.stream().map(CommentMapper::toCommentDto).collect(toList()));
+            return ItemMapper.toItemAllFieldsDto(item,
+                    getLastItem(bookings.get(item.getId())),
+                    getNextItem(bookings.get(item.getId())),
+                    comments.stream().map(CommentMapper::toCommentDto).collect(toList()));
     }
 
     private void valid(ItemDto itemDto) {
