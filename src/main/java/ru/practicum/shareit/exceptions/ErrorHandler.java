@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class ErrorHandler {
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
