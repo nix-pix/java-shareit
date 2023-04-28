@@ -8,13 +8,13 @@ import ru.practicum.shareit.user.dto.Update;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
 @AllArgsConstructor
 public class UserController {
-    UserService userService;
+    private final UserService userService;
 
     @PostMapping()
     public UserDto create(@RequestBody @Validated(Create.class) UserDto user) {
@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping
-    public Collection<UserDto> getAll() {
+    public List<UserDto> getAll() {
         return userService.getAll();
     }
 }
