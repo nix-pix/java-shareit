@@ -8,9 +8,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/items")
 @AllArgsConstructor
@@ -43,7 +40,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text) {
-        return itemService.getByText(text.toLowerCase());
+        return itemService.search(text.toLowerCase());
     }
 
     @PostMapping("{itemId}/comment")
@@ -53,5 +50,4 @@ public class ItemController {
                                     Long userId) {
         return itemService.createComment(commentDto, itemId, userId);
     }
-
 }

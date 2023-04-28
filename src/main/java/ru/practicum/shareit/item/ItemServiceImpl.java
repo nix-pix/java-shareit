@@ -25,37 +25,36 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static ru.practicum.shareit.enums.States.PAST;
 
-
 @Slf4j
 @Service
 @Transactional
 public class ItemServiceImpl implements ItemService {
-    private final ItemRepository itemStorage;
+    private final ItemRepository itemRepository;
     private final UserService userService;
-    private final CommentRepository commentStorage;
+    private final CommentRepository commentRepository;
     private final BookingService bookingService;
 
     @Autowired
-    public ItemServiceImpl(ItemRepository itemStorage,
+    public ItemServiceImpl(ItemRepository itemRepository,
                            UserService userService,
-                           CommentRepository commentStorage,
+                           CommentRepository commentRepository,
                            BookingService bookingService) {
-        this.itemStorage = itemStorage;
+        this.itemRepository = itemRepository;
         this.userService = userService;
-        this.commentStorage = commentStorage;
+        this.commentRepository = commentRepository;
         this.bookingService = bookingService;
     }
 
     @Override
     public ItemAllDto get(Long id, Long userId) {
-        Item item = itemStorage.findById(id).orElseThrow(
+        Item item = itemRepository.findById(id).orElseThrow(
                 () -> new ObjectNotFoundException("Вещь с id " + id + " не найдена"));
-        List<Comment> comments = commentStorage.findByItem(item, Sort.by(DESC, "created"));
+        List<Comment> comments = commentRepository.findByItem(item, Sort.by(DESC, "created"));
         List<BookingAllDto> bookings = bookingService.getBookingsByItem(item.getId(), userId);
         return ItemMapper.toItemAllFieldsDto(item,
-               getLastItem(bookings),
-               getNextItem(bookings),
-               comments.stream().map(CommentMapper::toCommentDto).collect(toList()));
+                getLastItem(bookings),
+                getNextItem(bookings),
+                comments.stream().map(CommentMapper::toCommentDto).collect(toList()));
     }
 
     @Override
@@ -65,7 +64,7 @@ public class ItemServiceImpl implements ItemService {
         User owner = UserMapper.toUser(userService.get(userId));
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(owner);
-        return ItemMapper.toItemDto(itemStorage.save(item));
+        return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
     @Override
@@ -74,23 +73,18 @@ public class ItemServiceImpl implements ItemService {
         if (userId == null) {
             throw new IncorrectParameterException("Id пользователя не задан!");
         }
-
-        Item item = itemStorage.getReferenceById(id);
-
+        Item item = itemRepository.getReferenceById(id);
         if (!item.getOwner().getId().equals(userId)) {
             throw new ObjectNotFoundException("Пользователь с id=" + userId + " не является владельцем вещи с id=" + id);
         }
-
         String patchName = itemDto.getName();
         if (Objects.nonNull(patchName) && !patchName.isEmpty()) {
             item.setName(patchName);
         }
-
         String patchDescription = itemDto.getDescription();
         if (Objects.nonNull(patchDescription) && !patchDescription.isEmpty()) {
             item.setDescription(patchDescription);
         }
-
         Boolean patchAvailable = itemDto.getAvailable();
         if (Objects.nonNull(patchAvailable)) {
             item.setAvailable(patchAvailable);
@@ -98,28 +92,26 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(item);
     }
 
-
     @Override
     public List<ItemAllDto> getAll(Long id) {
         User owner = UserMapper.toUser(userService.get(id));
         if (owner != null) {
-            List<Item> allItems = itemStorage.findAllByOwner_IdIs(id);
-            List<Comment> comments = commentStorage.findByItemIn(allItems, Sort.by(DESC, "created"));
+            List<Item> allItems = itemRepository.findAllByOwner_IdIs(id);
+            List<Comment> comments = commentRepository.findByItemIn(allItems, Sort.by(DESC, "created"));
             Map<Long, List<BookingAllDto>> bookings = bookingService.getBookingsByOwner(id, null).stream()
                     .collect(groupingBy((BookingAllDto bookingExtendedDto) -> bookingExtendedDto.getItem().getId()));
-            return  allItems.stream()
+            return allItems.stream()
                     .map(item -> getItemAllFieldsDto(comments, bookings, item))
                     .collect(toList());
         } else {
-
             throw new ObjectNotFoundException("Пользователь с id" + id + "не найден");
         }
     }
 
     @Override
-    public List<ItemDto> getByText(String text) {
+    public List<ItemDto> search(String text) {
         if (text.isBlank()) return Collections.emptyList();
-        return itemStorage.getAllText(text).stream()
+        return itemRepository.getAllText(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(toList());
     }
@@ -131,7 +123,7 @@ public class ItemServiceImpl implements ItemService {
                                     Long userId) {
         if (commentDto.getText() == null || commentDto.getText().isBlank())
             throw new IncorrectParameterException("Текст комментария не может быть пустым");
-        Item item = itemStorage.findById(itemId).orElseThrow(
+        Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new ObjectNotFoundException("Вещь с id = " + itemId + " не найдена"));
         User user = UserMapper.toUser(userService.get(userId));
         List<BookingAllDto> bookings = bookingService.getAll(userId, PAST.name());
@@ -140,13 +132,13 @@ public class ItemServiceImpl implements ItemService {
         comment.setItem(item);
         comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
-        Comment save = commentStorage.save(comment);
+        Comment save = commentRepository.save(comment);
         return CommentMapper.toCommentDto(save);
     }
 
     @Override
     public List<CommentDto> getAllComments() {
-        return commentStorage.findAll()
+        return commentRepository.findAll()
                 .stream()
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
@@ -155,10 +147,10 @@ public class ItemServiceImpl implements ItemService {
     private ItemAllDto getItemAllFieldsDto(List<Comment> comments,
                                            Map<Long, List<BookingAllDto>> bookings,
                                            Item item) {
-            return ItemMapper.toItemAllFieldsDto(item,
-                    getLastItem(bookings.get(item.getId())),
-                    getNextItem(bookings.get(item.getId())),
-                    comments.stream().map(CommentMapper::toCommentDto).collect(toList()));
+        return ItemMapper.toItemAllFieldsDto(item,
+                getLastItem(bookings.get(item.getId())),
+                getNextItem(bookings.get(item.getId())),
+                comments.stream().map(CommentMapper::toCommentDto).collect(toList()));
     }
 
     private void valid(ItemDto itemDto) {
@@ -167,7 +159,7 @@ public class ItemServiceImpl implements ItemService {
         } else if (itemDto.getName() == null) {
             throw new IncorrectParameterException("Не задано название инструмента");
         } else if (itemDto.getDescription() == null) {
-            throw new IncorrectParameterException("Не задано описание иснтрумента");
+            throw new IncorrectParameterException("Не задано описание инструмента");
         } else if (itemDto.getName().isEmpty() || itemDto.getDescription().isEmpty()) {
             throw new IncorrectParameterException("Некорректно заданы поля в запросе");
         }

@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import java.util.List;
 
 public interface ItemService {
+
     ItemAllDto get(Long id, Long userId);
 
     ItemDto save(ItemDto item, Long userId);
@@ -15,7 +16,7 @@ public interface ItemService {
 
     List<ItemAllDto> getAll(Long id);
 
-    List<ItemDto> getByText(String text);
+    List<ItemDto> search(String text);
 
     CommentDto createComment(CommentDto comment, Long itemId, Long userId);
 
