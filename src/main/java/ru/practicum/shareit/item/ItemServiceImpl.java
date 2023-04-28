@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingService;
@@ -27,23 +27,13 @@ import static ru.practicum.shareit.enums.State.PAST;
 
 @Slf4j
 @Service
-@Transactional
+@org.springframework.transaction.annotation.Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
     private final CommentRepository commentRepository;
     private final BookingService bookingService;
-
-    @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository,
-                           UserService userService,
-                           CommentRepository commentRepository,
-                           BookingService bookingService) {
-        this.itemRepository = itemRepository;
-        this.userService = userService;
-        this.commentRepository = commentRepository;
-        this.bookingService = bookingService;
-    }
 
     @Override
     public ItemAllDto get(Long id, Long userId) {
@@ -60,7 +50,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto save(ItemDto itemDto, Long userId) {
-        valid(itemDto);
         User owner = UserMapper.toUser(userService.get(userId));
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(owner);
@@ -78,11 +67,11 @@ public class ItemServiceImpl implements ItemService {
             throw new ObjectNotFoundException("Пользователь с id=" + userId + " не является владельцем вещи с id=" + id);
         }
         String patchName = itemDto.getName();
-        if (Objects.nonNull(patchName) && !patchName.isEmpty()) {
+        if (Objects.nonNull(patchName) && !patchName.isBlank()) {
             item.setName(patchName);
         }
         String patchDescription = itemDto.getDescription();
-        if (Objects.nonNull(patchDescription) && !patchDescription.isEmpty()) {
+        if (Objects.nonNull(patchDescription) && !patchDescription.isBlank()) {
             item.setDescription(patchDescription);
         }
         Boolean patchAvailable = itemDto.getAvailable();
@@ -109,7 +98,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text) {
+    public List<ItemDto> search(String text) { //Поиск вещи по наличию текста в имени или описании
         if (text.isBlank()) return Collections.emptyList();
         return itemRepository.getAllText(text).stream()
                 .map(ItemMapper::toItemDto)
@@ -151,18 +140,6 @@ public class ItemServiceImpl implements ItemService {
                 getLastItem(bookings.get(item.getId())),
                 getNextItem(bookings.get(item.getId())),
                 comments.stream().map(CommentMapper::toCommentDto).collect(toList()));
-    }
-
-    private void valid(ItemDto itemDto) {
-        if (itemDto.getAvailable() == null) {
-            throw new IncorrectParameterException("Не определена доступность инструмента");
-        } else if (itemDto.getName() == null) {
-            throw new IncorrectParameterException("Не задано название инструмента");
-        } else if (itemDto.getDescription() == null) {
-            throw new IncorrectParameterException("Не задано описание инструмента");
-        } else if (itemDto.getName().isEmpty() || itemDto.getDescription().isEmpty()) {
-            throw new IncorrectParameterException("Некорректно заданы поля в запросе");
-        }
     }
 
     private BookingAllDto getNextItem(List<BookingAllDto> bookings) {

@@ -62,8 +62,7 @@ public class BookingServiceImpl implements BookingService {
                 || !booking.getStatus().equals(WAITING))
             throw new IncorrectParameterException("Бронирование не может быть обновлено");
         booking.setStatus(approved ? APPROVED : REJECTED);
-        Booking savedBooking = bookingRepository.save(booking);
-        return BookingMapper.mapToBookingAllFieldsDto(savedBooking);
+        return BookingMapper.mapToBookingAllFieldsDto(booking);
     }
 
     @Override
@@ -108,7 +107,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingAllDto> getBookingsByItem(Long itemId, Long userId) {
-        return bookingRepository.findBookingsByItem_IdAndItem_Owner_IdIsOrderByStart(
+        return bookingRepository.findBookingsByItemIdAndItemOwnerIdIsOrderByStart(
                         itemId, userId)
                 .stream()
                 .map(BookingMapper::mapToBookingAllFieldsDto)

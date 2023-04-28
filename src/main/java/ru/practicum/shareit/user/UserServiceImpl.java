@@ -1,8 +1,8 @@
 package ru.practicum.shareit.user;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,13 +18,9 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     @Transactional
@@ -35,17 +31,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto update(UserDto userDto, Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> {
-            throw new ObjectNotFoundException("Пользователь с id = " + id + " не найден.");
-        });
-        if (userDto.getName() != null) {
+        User user;
+        user = userRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Пользователь с id = " + id + " не найден."));
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
             user.setName(userDto.getName());
         }
-        if (userDto.getEmail() != null) {
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
             user.setEmail(userDto.getEmail());
         }
         try {
-            return UserMapper.toUserDto(userRepository.save(user));
+            return UserMapper.toUserDto(user);
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause() instanceof ConstraintViolationException) {
                 throw new ParameterException(ex.getMessage());

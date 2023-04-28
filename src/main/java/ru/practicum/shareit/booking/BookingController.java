@@ -18,7 +18,7 @@ public class BookingController {
 
     @PostMapping()
     public BookingAllDto save(@RequestBody BookingControllerDto bookingControllerDto,
-                              @RequestHeader(value = "X-Sharer-User-Id", required = false)
+                              @RequestHeader(value = "X-Sharer-User-Id")
                               Long userId) {
         ItemAllDto item = itemService.get(bookingControllerDto.getItemId(), userId);
         return bookingService.save(bookingControllerDto, item, userId);
@@ -26,29 +26,29 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     public BookingAllDto approve(@PathVariable Long bookingId,
-                                 @RequestParam(required = false) boolean approved,
-                                 @RequestHeader(value = "X-Sharer-User-Id", required = false)
+                                 @RequestParam boolean approved,
+                                 @RequestHeader(value = "X-Sharer-User-Id")
                                  Long userId) {
         return bookingService.approve(bookingId, approved, userId);
     }
 
     @GetMapping("/owner")
-    public List<BookingAllDto> getBookingsByOwner(@RequestParam(required = false) String state,
-                                                  @RequestHeader(value = "X-Sharer-User-Id", required = false)
+    public List<BookingAllDto> getBookingsByOwner(@RequestParam(defaultValue = "ALL") String state,
+                                                  @RequestHeader(value = "X-Sharer-User-Id")
                                                   Long userId) {
         return bookingService.getBookingsByOwner(userId, state);
     }
 
     @GetMapping()
-    public List<BookingAllDto> getAll(@RequestParam(required = false) String state,
-                                      @RequestHeader(value = "X-Sharer-User-Id", required = false)
+    public List<BookingAllDto> getAll(@RequestParam(defaultValue = "ALL") String state,
+                                      @RequestHeader(value = "X-Sharer-User-Id")
                                       Long userId) {
         return bookingService.getAll(userId, state);
     }
 
     @GetMapping("/{bookingId}")
     public BookingAllDto get(@PathVariable Long bookingId,
-                             @RequestHeader(value = "X-Sharer-User-Id", required = false)
+                             @RequestHeader(value = "X-Sharer-User-Id")
                              Long userId) {
         return bookingService.get(bookingId, userId);
     }
