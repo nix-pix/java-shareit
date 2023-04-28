@@ -21,7 +21,6 @@ import static javax.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 @Table(name = "bookings")
 public class Booking {
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
