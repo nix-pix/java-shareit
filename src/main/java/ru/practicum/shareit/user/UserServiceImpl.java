@@ -11,7 +11,6 @@ import ru.practicum.shareit.exception.ParameterException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -51,11 +50,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto get(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new ObjectNotFoundException("Пользователь с id = " + id + " не найден");
-        }
-        return UserMapper.toUserDto(user.get());
+        User user = userRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Пользователь с id = " + id + " не найден"));
+        return UserMapper.toUserDto(user);
     }
 
     @Override

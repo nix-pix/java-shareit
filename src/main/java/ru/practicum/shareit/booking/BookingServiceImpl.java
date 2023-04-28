@@ -17,7 +17,6 @@ import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -167,16 +166,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void valid(BookingControllerDto bookingSavingDto) {
-        if (bookingSavingDto.getStart() == null)
-            throw new IncorrectParameterException("Не задана дата начала бронирования");
-        if (bookingSavingDto.getEnd() == null)
-            throw new IncorrectParameterException("Не задана дата окончания бронирования");
         if (bookingSavingDto.getStart().equals(bookingSavingDto.getEnd()))
             throw new IncorrectParameterException("Даты начала и конца бронирования совпадают");
-        if (bookingSavingDto.getStart().toLocalDate().isBefore(LocalDate.now()))
-            throw new IncorrectParameterException("Некорректная дата начала бронирования");
-        if (bookingSavingDto.getEnd().isBefore(bookingSavingDto.getStart())
-                || bookingSavingDto.getEnd().toLocalDate().isBefore(LocalDate.now()))
+        if (bookingSavingDto.getEnd().isBefore(bookingSavingDto.getStart()))
             throw new IncorrectParameterException("Некорректная дата бронирования");
     }
 }
