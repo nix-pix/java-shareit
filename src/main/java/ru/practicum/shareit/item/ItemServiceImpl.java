@@ -147,7 +147,7 @@ public class ItemServiceImpl implements ItemService {
     private BookingAllDto getNextItem(List<BookingAllDto> bookings, LocalDateTime now) {
         return bookings != null
                 ? bookings.stream()
-                .filter(booking -> booking.getStart().isAfter(now) && !Objects.equals(booking.getStatus().toString(), "REJECTED"))
+                .filter(booking -> booking.getStart().isAfter(now))
                 .min(Comparator.comparing(BookingAllDto::getEnd)).orElse(null)
                 : null;
     }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.enums.Status;
 import ru.practicum.shareit.user.User;
 
@@ -22,11 +23,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingsByItemOwnerIsAndStatusIsOrderByStartDesc(User user,
                                                                        Status bookingState);
 
-    List<Booking> findBookingsByItemIdAndItemOwnerIdIsOrderByStart(Long itemId, Long userId);
-
     List<Booking> findBookingsByItemOwnerIsOrderByStartDesc(User user);
 
-    //for booker
     List<Booking> findBookingsByBookerIsAndStartBeforeAndEndAfterOrderByStartDesc(User booker,
                                                                                   LocalDateTime startDateTime,
                                                                                   LocalDateTime endDateTime);
@@ -41,4 +39,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                                                     Status bookingState);
 
     List<Booking> findBookingsByBookerIsOrderByStartDesc(User booker);
+
+    @Query("select b from Booking b where b.item.id = ?1 and b.item.owner.id = ?2 and b.status = 'APPROVED' order by b.start DESC")
+    List<Booking> findApprovedBookings(Long itemId, Long userId);
 }
