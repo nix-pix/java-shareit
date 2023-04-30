@@ -1,41 +1,70 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exception.ObjectNotFoundException;
+import ru.practicum.shareit.exception.ParameterException;
+import ru.practicum.shareit.user.dto.UserDto;
 
-import java.util.Collection;
+import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
+@Slf4j
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    UserRepository userRepositoryImpl;
+    private final UserRepository userRepository;
 
-    @Autowired
-    public UserServiceImpl(UserRepositoryImpl userRepositoryImpl) {
-        this.userRepositoryImpl = userRepositoryImpl;
+    @Override
+    @Transactional
+    public UserDto save(UserDto userDto) {
+        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
     @Override
-    public User create(User user) {
-        return userRepositoryImpl.create(user);
+    @Transactional
+    public UserDto update(UserDto userDto, Long id) {
+        User user;
+        user = userRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Пользователь с id = " + id + " не найден."));
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            user.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            user.setEmail(userDto.getEmail());
+        }
+        try {
+            return UserMapper.toUserDto(user);
+        } catch (DataIntegrityViolationException ex) {
+            if (ex.getCause() instanceof ConstraintViolationException) {
+                throw new ParameterException(ex.getMessage());
+            }
+        }
+        return null;
     }
 
     @Override
-    public User update(User user, long userId) {
-        return userRepositoryImpl.update(user, userId);
+    public UserDto get(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Пользователь с id = " + id + " не найден"));
+        return UserMapper.toUserDto(user);
     }
 
     @Override
-    public void delete(long userId) {
-        userRepositoryImpl.delete(userId);
+    @Transactional
+    public void delete(Long id) {
+        userRepository.deleteById(id);
     }
 
     @Override
-    public User get(long userId) {
-        return userRepositoryImpl.get(userId);
-    }
-
-    @Override
-    public Collection<User> getAll() {
-        return userRepositoryImpl.getAll();
+    public List<UserDto> getAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toUserDto)
+                .collect(toList());
     }
 }
