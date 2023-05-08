@@ -1,2 +1,4 @@
-# java-shareit
-Repository for Shareit project.
+# Share It!
+Сервис, где ты можешь найти всё, что тебе нужно на время и также поделиться своими вещами с другими
+
+Стек технологий: ***Java 11, PostgreSQL, Maven, Lombok, Hibernate***
