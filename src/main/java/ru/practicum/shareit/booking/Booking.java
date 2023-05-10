@@ -7,7 +7,6 @@ import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -36,17 +35,4 @@ public class Booking {
     private User booker;
     @Enumerated(STRING)
     private Status status;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Booking booking = (Booking) o;
-        return id != null && Objects.equals(id, booking.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Long.hashCode(id);
-    }
 }
