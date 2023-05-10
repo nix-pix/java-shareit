@@ -8,7 +8,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import java.util.List;
 
 public class ItemRequestMapper {
-
     public static ItemRequest mapToItemRequest(ItemRequestDto itemRequestDto, UserDto userDto) {
         return ItemRequest.builder()
                 .id(itemRequestDto.getId())

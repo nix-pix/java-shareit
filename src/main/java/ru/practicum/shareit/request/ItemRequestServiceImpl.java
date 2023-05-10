@@ -1,8 +1,10 @@
 package ru.practicum.shareit.request;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.IncorrectParameterException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.item.ItemService;
@@ -12,6 +14,7 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +23,9 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static ru.practicum.shareit.util.Pagination.makePageRequest;
 
+@Slf4j
+@Service
+@Transactional
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
     private final UserService userService;
