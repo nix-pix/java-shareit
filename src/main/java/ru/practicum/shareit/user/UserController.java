@@ -10,7 +10,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -42,5 +41,4 @@ public class UserController {
     public List<UserDto> getAll() {
         return userService.getAll();
     }
-
 }
