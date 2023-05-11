@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
@@ -32,7 +31,7 @@ public class ErrorHandler {
     public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
         log.warn(e.getMessage());
         return new ErrorResponse(
-                String.format(e.getMessage())
+                e.getMessage()
         );
     }
 

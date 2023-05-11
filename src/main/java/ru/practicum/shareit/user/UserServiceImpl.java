@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
     public void valid(UserDto user) {
         if (user == null) {
-            throw new IncorrectParameterException("При создании пользователя передан некорреткный параметр");
+            throw new IncorrectParameterException("При создании пользователя передан некорректный параметр");
         } else if (user.getEmail() == null) {
             throw new IncorrectParameterException("Email не может быть пустым");
         } else if (!isValidEmailAddress(user.getEmail())) {
