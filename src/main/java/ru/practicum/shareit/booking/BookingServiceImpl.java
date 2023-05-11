@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,6 @@ import static ru.practicum.shareit.enums.State.*;
 import static ru.practicum.shareit.enums.Status.*;
 import static ru.practicum.shareit.util.Pagination.makePageRequest;
 
-@Slf4j
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,7 +14,6 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
@@ -39,14 +37,12 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id).orElseThrow(() -> {
             throw new ObjectNotFoundException("Пользователь с id = " + id + " не найден.");
         });
-
         if (userDto.getName() != null) {
             user.setName(userDto.getName());
         }
         if (userDto.getEmail() != null) {
             user.setEmail(userDto.getEmail());
         }
-
         try {
             return UserMapper.toUserDto(userRepository.save(user));
         } catch (DataIntegrityViolationException ex) {
@@ -65,7 +61,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id).orElseThrow(() -> {
             throw new ObjectNotFoundException("Пользователь с id = " + id + " не найден");
         });
-
         return UserMapper.toUserDto(user);
     }
 

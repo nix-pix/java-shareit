@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -30,7 +29,6 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 import static ru.practicum.shareit.enums.State.PAST;
 import static ru.practicum.shareit.util.Pagination.makePageRequest;
 
-@Slf4j
 @Service
 @Transactional
 public class ItemServiceImpl implements ItemService {
@@ -75,37 +73,31 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
-
     @Override
     @Transactional
     public ItemDto update(ItemDto itemDto, Long id, Long userId) {
         if (userId == null) {
             throw new IncorrectParameterException("Id пользователя не задан!");
         }
-
         Item item = itemRepository.findById(id).get();
 
         if (!item.getOwner().getId().equals(userId)) {
             throw new ObjectNotFoundException("Пользователь с id=" + userId + " не является владельцем вещи с id=" + id);
         }
-
         String patchName = itemDto.getName();
         if (Objects.nonNull(patchName) && !patchName.isEmpty()) {
             item.setName(patchName);
         }
-
         String patchDescription = itemDto.getDescription();
         if (Objects.nonNull(patchDescription) && !patchDescription.isEmpty()) {
             item.setDescription(patchDescription);
         }
-
         Boolean patchAvailable = itemDto.getAvailable();
         if (Objects.nonNull(patchAvailable)) {
             item.setAvailable(patchAvailable);
         }
         return ItemMapper.toItemDto(itemRepository.save(item));
     }
-
 
     @Override
     public List<ItemAllDto> getAll(Long id, Integer from, Integer size) {
@@ -121,12 +113,10 @@ public class ItemServiceImpl implements ItemService {
             List<Comment> comments = commentRepository.findByItemIn(allItems, Sort.by(DESC, "created"));
             Map<Long, List<BookingAllDto>> bookings = bookingService.getBookingsByOwner(id, null).stream()
                     .collect(groupingBy((BookingAllDto bookingExtendedDto) -> bookingExtendedDto.getItem().getId()));
-
-            return  allItems.stream()
+            return allItems.stream()
                     .map(item -> getItemAllFieldsDto(comments, bookings, item))
                     .collect(toList());
         } else {
-
             throw new ObjectNotFoundException("Пользователь с id" + id + "не найден");
         }
     }

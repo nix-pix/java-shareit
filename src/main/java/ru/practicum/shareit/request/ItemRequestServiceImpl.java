@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,7 +22,6 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static ru.practicum.shareit.util.Pagination.makePageRequest;
 
-@Slf4j
 @Service
 @Transactional
 public class ItemRequestServiceImpl implements ItemRequestService {
