@@ -40,8 +40,8 @@ class ItemRequestServiceTest {
     void initialize() {
         userDto = new UserDto(
                 1L,
-                "marry",
-                "marry@mail.com");
+                "Marry",
+                "marry@mail.ru");
         itemRequestDto = new ItemRequestDto(
                 1L,
                 "my request",

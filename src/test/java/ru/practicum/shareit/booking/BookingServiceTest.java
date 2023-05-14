@@ -59,14 +59,14 @@ class BookingServiceTest {
         userDto = UserDto.builder()
                 .id(1L)
                 .name("Lora")
-                .email("lora@mail.com")
+                .email("lora@mail.ru")
                 .build();
         booking = Booking.builder()
                 .id(1L)
                 .start(now())
                 .end(now().plusHours(2))
                 .item(new Item(1L, "pen", "blue pen", true, toUser(userDto), null))
-                .booker(new User(2L, "Maggie", "maggie@mail.com"))
+                .booker(new User(2L, "Maggie", "maggie@mail.ru"))
                 .status(WAITING)
                 .build();
     }

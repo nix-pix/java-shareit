@@ -37,7 +37,7 @@ class ItemRequestServiceImplTest {
         UserDto userDto = new UserDto(
                 null,
                 "John",
-                "john@mail.com"
+                "john@mail.ru"
         );
         user = userService.save(userDto);
         itemRequestDto = new ItemRequestDto(
@@ -139,7 +139,7 @@ class ItemRequestServiceImplTest {
                 new UserDto(
                         null,
                         "Clare",
-                        "clare@mail.com")
+                        "clare@mail.ru")
         );
         List<ItemRequestDto> allItemRequests = itemRequestService.getAllItemRequests(null, null, userDto.getId());
         List<ItemRequest> itemRequests = entityManager.createQuery(

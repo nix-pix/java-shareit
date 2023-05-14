@@ -49,7 +49,7 @@ class ItemServiceTest {
         userDto = new UserDto(
                 1L,
                 "Eddie",
-                "eddie@mail.com");
+                "eddie@mail.ru");
         item = new Item(
                 1L,
                 "Pocket",
@@ -246,7 +246,7 @@ class ItemServiceTest {
                         null,
                         1L)
         );
-        assertEquals("Не задано описание иснтрумента", exception.getMessage());
+        assertEquals("Не задано описание инструмента", exception.getMessage());
     }
 
     @Test

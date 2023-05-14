@@ -192,7 +192,7 @@ public class ItemServiceImpl implements ItemService {
         } else if (itemDto.getName() == null) {
             throw new IncorrectParameterException("Не задано название инструмента");
         } else if (itemDto.getDescription() == null) {
-            throw new IncorrectParameterException("Не задано описание иснтрумента");
+            throw new IncorrectParameterException("Не задано описание инструмента");
         } else if (itemDto.getName().isEmpty() || itemDto.getDescription().isEmpty()) {
             throw new IncorrectParameterException("Некорректно заданы поля в запросе");
         }

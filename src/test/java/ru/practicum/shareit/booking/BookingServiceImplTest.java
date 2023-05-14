@@ -43,13 +43,13 @@ class BookingServiceImplTest {
                 new UserDto(
                         null,
                         "Lora",
-                        "lora@mail.com")
+                        "lora@mail.ru")
         );
         UserDto booker = userService.save(
                 new UserDto(
                         null,
                         "Mike",
-                        "mike@mail.com")
+                        "mike@mail.ru")
         );
         itemDto = itemService.save(
                 new ItemDto(

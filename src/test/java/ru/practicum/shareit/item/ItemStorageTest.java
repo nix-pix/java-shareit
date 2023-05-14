@@ -21,7 +21,7 @@ class ItemRepositoryTest {
     User user = User.builder()
             .id(null)
             .name("Smith")
-            .email("smith@mail.com")
+            .email("smith@mail.ru")
             .build();
     Item item1;
     Item item2;

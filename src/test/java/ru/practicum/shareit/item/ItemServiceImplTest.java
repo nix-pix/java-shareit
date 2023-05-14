@@ -45,7 +45,7 @@ class ItemServiceImplTest {
                 new UserDto(
                         null,
                         "Joe",
-                        "joe@mail.com")
+                        "joe@mail.ru")
         );
         itemDto = itemService.save(
                 new ItemDto(null,
@@ -225,14 +225,14 @@ class ItemServiceImplTest {
                 new UserDto(
                         12L,
                         "Richard",
-                        "richard@mail.com")
+                        "richard@mail.ru")
         );
         saveCommentDto(
                 "Spring",
                 new UserDto(
                         13L,
                         "Bethany",
-                        "bethany@mail.com")
+                        "bethany@mail.ru")
         );
         var allComments = itemService.getAllComments();
         var comments = entityManager.createQuery(
@@ -251,7 +251,7 @@ class ItemServiceImplTest {
                 new UserDto(
                         null,
                         "Abby",
-                        "abby@mail.com")
+                        "abby@mail.ru")
         );
         ItemRequestDto itemRequestDto = itemRequestService.save(
                 new ItemRequestDto(
@@ -317,7 +317,7 @@ class ItemServiceImplTest {
                 new UserDto(
                         15L,
                         "Douglas",
-                        "douglas@mail.com")
+                        "douglas@mail.ru")
         );
         Comment comment = entityManager.createQuery(
                 "SELECT comment " +
@@ -336,7 +336,7 @@ class ItemServiceImplTest {
                 new UserDto(
                         null,
                         "Zoe",
-                        "zoe@mail.com")
+                        "zoe@mail.ru")
         );
         ItemRequestDto itemRequestDto = itemRequestService.save(
                 new ItemRequestDto(
@@ -366,7 +366,7 @@ class ItemServiceImplTest {
                 new UserDto(
                         15L,
                         "Douglas",
-                        "douglas@mail.com")
+                        "douglas@mail.ru")
         );
         List<CommentDto> allComments = itemService.getAllComments();
         List<Comment> comments = entityManager.createQuery(
