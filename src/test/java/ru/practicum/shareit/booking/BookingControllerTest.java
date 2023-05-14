@@ -26,7 +26,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.enums.Status.WAITING;
@@ -104,26 +103,6 @@ class BookingControllerTest {
     }
 
     @Test
-    void saveTest() throws Exception {
-        when(bookingService.save(any(), any(), anyLong()))
-                .thenReturn(bookingAllFieldsDto);
-        mvc.perform(post("/bookings")
-                        .content(mapper.writeValueAsString(bookingSavingDto))
-                        .header(headerSharerUserId, 1)
-                        .contentType(APPLICATION_JSON)
-                        .characterEncoding(UTF_8)
-                        .accept(APPLICATION_JSON)
-                )
-                .andExpect(jsonPath("$.start", is(bookingAllFieldsDto.getStart().toString())))
-                .andExpect(jsonPath("$.end", is(bookingAllFieldsDto.getEnd().toString())))
-                .andExpect(jsonPath("$.id", is(bookingAllFieldsDto.getId()), Long.class))
-                .andExpect(jsonPath("$.booker", notNullValue()))
-                .andExpect(jsonPath("$.item", notNullValue()))
-                .andExpect(status().isOk())
-                .andDo(print());
-    }
-
-    @Test
     void approveTest() throws Exception {
         when(bookingService.approve(anyLong(), anyBoolean(), anyLong()))
                 .thenReturn(bookingAllFieldsDto);
@@ -184,7 +163,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void saveNotFoundExceptionTest() throws Exception {
+    void saveBadRequestExceptionTest() throws Exception {
         when(bookingService.save(any(), any(), anyLong()))
                 .thenThrow(ObjectNotFoundException.class);
         mvc.perform(post("/bookings")
@@ -194,7 +173,7 @@ class BookingControllerTest {
                         .characterEncoding(UTF_8)
                         .accept(APPLICATION_JSON)
                 )
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

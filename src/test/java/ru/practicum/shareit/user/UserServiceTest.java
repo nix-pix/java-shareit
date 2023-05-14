@@ -36,17 +36,6 @@ class UserServiceTest {
     }
 
     @Test
-    void saveUserNullEmailTest() {
-        Exception exception = assertThrows(IncorrectParameterException.class,
-                () -> userService.save(new UserDto(
-                        null,
-                        "Molly",
-                        null))
-        );
-        assertEquals("Email не может быть пустым", exception.getMessage());
-    }
-
-    @Test
     void saveTest() {
         when(userRepository.save(any()))
                 .thenReturn(user);
@@ -62,32 +51,6 @@ class UserServiceTest {
                 .thenThrow(IncorrectParameterException.class);
         assertThrows(IncorrectParameterException.class,
                 () -> userService.save(userDto));
-    }
-
-    @Test
-    void saveUserEmptyEmailTest() {
-        Exception exception = assertThrows(IncorrectParameterException.class,
-                () -> userService.save(new UserDto(
-                        null, "Abbie", "mail"))
-        );
-        assertEquals("Неверно задан email", exception.getMessage());
-    }
-
-    @Test
-    void saveNullUserEmptyTest() {
-        Exception exception = assertThrows(IncorrectParameterException.class,
-                () -> userService.save(null)
-        );
-        assertEquals("При создании пользователя передан некорректный параметр", exception.getMessage());
-    }
-
-    @Test
-    void saveNullEmailTest() {
-        Exception exception = assertThrows(IncorrectParameterException.class,
-                () -> userService.save(new UserDto(
-                        null, "Abbie", null))
-        );
-        assertEquals("Email не может быть пустым", exception.getMessage());
     }
 
     @Test

@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.dto.BookingControllerDto;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemAllDto;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,7 +19,7 @@ public class BookingController {
 
     @PostMapping()
     public BookingAllDto save(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
-                              @RequestBody BookingControllerDto bookingControllerDto) {
+                              @RequestBody @Valid BookingControllerDto bookingControllerDto) {
         ItemAllDto item = itemService.get(bookingControllerDto.getItemId(), userId);
         return bookingService.save(bookingControllerDto, item, userId);
     }
