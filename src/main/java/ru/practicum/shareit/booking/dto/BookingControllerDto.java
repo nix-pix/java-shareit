@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingControllerDto {
+    private Long id;
     @FutureOrPresent
     @NotNull
     private LocalDateTime start;
@@ -23,4 +24,6 @@ public class BookingControllerDto {
     private LocalDateTime end;
     @NotNull
     private Long itemId;
+    private Long booker;
+    private String status;
 }

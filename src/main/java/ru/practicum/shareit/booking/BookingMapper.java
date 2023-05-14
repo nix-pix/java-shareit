@@ -10,14 +10,14 @@ import ru.practicum.shareit.user.UserMapper;
 @UtilityClass
 public class BookingMapper {
 
-    public Booking toBooking(BookingControllerDto bookingDto) {
+    public static Booking toBooking(BookingControllerDto bookingDto) {
         return Booking.builder()
                 .start(bookingDto.getStart())
                 .end(bookingDto.getEnd())
                 .build();
     }
 
-    public BookingAllDto mapToBookingAllFieldsDto(Booking booking) {
+    public static BookingAllDto mapToBookingAllFieldsDto(Booking booking) {
         return BookingAllDto.builder()
                 .id(booking.getId())
                 .start(booking.getStart())
