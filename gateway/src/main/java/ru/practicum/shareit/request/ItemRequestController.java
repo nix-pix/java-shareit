@@ -1,39 +1,44 @@
 package ru.practicum.shareit.request;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 
 import javax.validation.Valid;
-import java.util.List;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
+@Validated
 @RestController
-@RequestMapping(path = "/requests")
 @AllArgsConstructor
+@RequestMapping(path = "/requests")
 public class ItemRequestController {
-    private final ItemRequestService itemRequestService;
-
-    @GetMapping()
-    public List<ItemRequestDto> getItemRequests(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId) {
-        return itemRequestService.getAllItemRequests(userId);
-    }
+    private static final String HEADER_SHARER_USER_ID = "X-Sharer-User-Id";
+    private final ItemRequestClient itemRequestClient;
 
     @GetMapping("/all")
-    public List<ItemRequestDto> getAllItemRequests(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
-                                                   @RequestParam(required = false) Integer from,
-                                                   @RequestParam(required = false) Integer size) {
-        return itemRequestService.getAllItemRequests(from, size, userId);
+    public ResponseEntity<Object> getAllItemRequests(@PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                     @RequestHeader(required = false, value = HEADER_SHARER_USER_ID) Long userId, @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return itemRequestClient.getAllItemRequests(from, size, userId);
     }
 
+    @Validated
     @PostMapping()
-    public ItemRequestDto createItemRequest(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
-                                            @RequestBody @Valid ItemRequestDto itemRequestDto) {
-        return itemRequestService.save(itemRequestDto, userId);
+    public ResponseEntity<Object> createItemRequest(@RequestHeader(value = HEADER_SHARER_USER_ID) Long userId,
+                                                    @RequestBody @Valid ItemRequestDto itemRequestDto) {
+        return itemRequestClient.createItemRequest(itemRequestDto, userId);
+    }
+
+    @GetMapping()
+    public ResponseEntity<Object> getItemRequests(@RequestHeader(value = HEADER_SHARER_USER_ID) Long userId) {
+        return itemRequestClient.getItemRequests(userId);
     }
 
     @GetMapping("/{requestId}")
-    public ItemRequestDto getItemRequest(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
-                                         @PathVariable Long requestId) {
-        return itemRequestService.getItemRequestById(requestId, userId);
+    public ResponseEntity<Object> getItemRequest(@RequestHeader(value = HEADER_SHARER_USER_ID) Long userId,
+                                                 @PathVariable Long requestId) {
+        return itemRequestClient.getItemRequest(requestId, userId);
     }
 }

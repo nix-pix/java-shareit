@@ -79,12 +79,4 @@ public class UserServiceImpl implements UserService {
                 .map(UserMapper::toUserDto)
                 .collect(toList());
     }
-
-    public void valid(UserDto user) {
-        if (user == null) {
-            throw new IncorrectParameterException("При создании пользователя передан некорректный параметр");
-        } else if (user.getEmail() == null) {
-            throw new IncorrectParameterException("Email не может быть пустым");
-        }
-    }
 }
