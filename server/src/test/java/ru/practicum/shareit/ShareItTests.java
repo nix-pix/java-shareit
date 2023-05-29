@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class ShareItTests {
     @Autowired
-    private ShareItApp shareItApp;
+    private ShareItServer shareItApp;
 
     @Test
     public void main() {

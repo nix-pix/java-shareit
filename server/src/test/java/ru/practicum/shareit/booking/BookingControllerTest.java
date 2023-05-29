@@ -163,7 +163,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void saveBadRequestExceptionTest() throws Exception {
+    void saveNotFoundExceptionTest() throws Exception {
         when(bookingService.save(any(), any(), anyLong()))
                 .thenThrow(ObjectNotFoundException.class);
         mvc.perform(post("/bookings")
@@ -173,7 +173,7 @@ class BookingControllerTest {
                         .characterEncoding(UTF_8)
                         .accept(APPLICATION_JSON)
                 )
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
