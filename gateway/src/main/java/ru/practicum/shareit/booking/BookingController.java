@@ -28,7 +28,7 @@ public class BookingController {
                                                    @RequestParam(name = "state", defaultValue = "all") String stateParam,
                                                    @RequestHeader(HEADER_SHARER_USER_ID) Long userId) {
         BookingState state = BookingState.from(stateParam).orElseThrow(
-                () -> new IllegalArgumentException("Unknown state: " + stateParam));
+                () -> new IncorrectParameterException("Unknown state: " + stateParam));
         return bookingClient.getOwnerBookings(userId, state, from, size);
     }
 
@@ -38,7 +38,7 @@ public class BookingController {
                                               @RequestParam(name = "state", defaultValue = "all") String stateParam,
                                               @RequestHeader(HEADER_SHARER_USER_ID) Long userId) {
         BookingState state = BookingState.from(stateParam).orElseThrow(
-                () -> new IllegalArgumentException("Unknown state: " + stateParam));
+                () -> new IncorrectParameterException("Unknown state: " + stateParam));
         return bookingClient.getBookings(userId, state, from, size);
     }
 
