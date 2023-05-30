@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.exception.IncorrectParameterException;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
@@ -50,15 +51,15 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<Object> createBooking(@RequestHeader(HEADER_SHARER_USER_ID) Long userId,
-                                                @RequestBody BookingRequestDto requestDto) {
+                                                @RequestBody @Valid BookingRequestDto requestDto) {
         if (requestDto.getStart() == null)
             throw new IncorrectParameterException("Не задана дата начала бронирования");
         if (requestDto.getEnd() == null)
             throw new IncorrectParameterException("Не задана дата окончания бронирования");
         if (requestDto.getStart().isAfter(requestDto.getEnd()))
-            throw new IllegalArgumentException("Некорректная дата бронирования");
+            throw new IncorrectParameterException("Некорректная дата бронирования");
         if (requestDto.getStart().toLocalDate().isBefore(LocalDate.now()))
-            throw new IncorrectParameterException("Некорректная дата начала броинрования");
+            throw new IncorrectParameterException("Некорректная дата начала бронирования");
         if (requestDto.getEnd().isBefore(requestDto.getStart())
                 || requestDto.getEnd().toLocalDate().isBefore(LocalDate.now()))
             throw new IncorrectParameterException("Некорректная дата бронирования");
